@@ -69,7 +69,7 @@ for LINE in "${REPOARRAY[@]}"; do
 				if [[ ${REPONAME} == *".git"* ]];then
 					REPONAME="${REPONAME//.git}"					
 				fi				
-				
+				REPONAMEURLOLD=${REPONAMEURL}
 				REPONAMEURL="$(echo ${REPONAMEURL} | replace '//' '')"
 				IFS=':' read -ra NAMES <<< "${REPONAMEURL}"	
 				GITREPOURLPREPEND=${NAMES[0]}
@@ -127,9 +127,9 @@ for LINE in "${REPOARRAY[@]}"; do
 				NEWGITREPOURL="${GITREPOURLPREPEND}://${GITREPOURL}"
 				echo ${NEWGITREPOURL}
 				echo ${REPONAMEURL}
-				git remote set-url origin ${NEWGITREPOURL}
+				git remote set-url origin "${NEWGITREPOURL}"
 				git fetch origin
-				git remote set-url origin ${REPONAMEURL}
+				git remote set-url origin "${REPONAMEURLOLD}"
 				
 				echo ""
 				echo "*** Checking for any uncommitted changes";
@@ -151,7 +151,7 @@ for LINE in "${REPOARRAY[@]}"; do
 						git remote set-url origin "${NEWGITREPOURL}"
 						git commit -a -m "${gitcommitmessage}"
 						git fetch origin
-						git remote set-url origin "${REPONAMEURL}"
+						git remote set-url origin "${REPONAMEURLOLD}"
 
 					else
 						echo "!!!! Changes not being commited"
@@ -174,7 +174,7 @@ for LINE in "${REPOARRAY[@]}"; do
 					git remote set-url origin "${NEWGITREPOURL}"
 					git push origin
 					git fetch origin
-					git remote set-url origin "${REPONAMEURL}"			
+					git remote set-url origin "${REPONAMEURLOLD}"			
 				fi
 				
 				echo ""
