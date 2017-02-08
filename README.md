@@ -2,7 +2,8 @@
 GIT UTILITY BELT - Useful utililties for helping with everyday GIT duties
 
 
-As a dev working on a single project but spread over multiple repos I found wasting a lot of tim. So with this in mind I set out to create a GIT UTILITY BELT to help speed up development.
+As a dev working on a single project but spread over multiple repos I found wasting a lot of time. So with this in mind I set out to create a GIT UTILITY BELT to help speed up development. 
+Hope this helps someone as it grows and feel free to contribute.
 
 Currently on the belt:
 
