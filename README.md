@@ -10,13 +10,12 @@ Currently on the belt:
 <b>Purpose:</b><br />
 Scans a given subdirectory and gets all git repos under the subdirectory
 For each repo
-1. Checks if any uncommitted changes (dif between local and origin). If any uncommited changes where found it prompts and asked whether you want to commit - commits if your answer is yes
-2. Check if any local/branch is ahead of origin/branch. If local/branch is ahead it prompts and asked whether you want to do a origin push - does origin push if answer is yes
+1. Checks if any uncommitted changes (dif between local and origin). If any uncommited changes where found it prompts and asked whether you want to commit - commits if your answer is yes<br />
+2. Check if any local/branch is ahead of origin/branch. If local/branch is ahead it prompts and asked whether you want to do a origin push - does origin push if answer is yes<br />
 3. Check if any origin/branch is ahead of origin/master. If origin/branch is ahead it prompts and asked whether you want to do a pull request - does pull request if answer is yes (pull  request only currently available for bitbucket API)
 
 
 <b>Disclaimer:</b><br />
-
 GIT UTILITY BELT is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
