@@ -58,6 +58,7 @@ for LINE in "${REPOARRAY[@]}"; do
 
 			cd $d > /dev/null
 			if [ -d ".git" ]; then
+			
 				GITREPOURL=""
 				REPONAMEURL=$(git remote show -n origin | grep -i fetch | cut -d: -f2-)
 				REPONAMEURL="$(echo "$REPONAMEURL" | tr -d ' ')"
@@ -71,23 +72,23 @@ for LINE in "${REPOARRAY[@]}"; do
 				
 				IFS='\/\/' read -ra NAMES <<< "${REPONAMEURL}"	
 				GITREPOURLPREPEND=${NAMES[0]}
-				echo "-------${GITREPOURLPREPEND}"
 				
 				IFS='@' read -ra NAMES <<< "$REPONAMEURL"
-				echo ${REPONAMEURL}
+				
 				if [[ ${REPONAMEURL} != *"@"* ]];then
 					GITREPOURL=${NAMES[0]}
 				else
 				   GITREPOURL=${NAMES[1]}
 				fi
 				
-				echo "-------${GITREPOURL}"
 				IFS='\/' read -ra NAMES string <<< "$GITREPOURL"
 				PRSLUG="${NAMES[1]}/${NAMES[2]}"
 				PRSLUG="${PRSLUG//.git}"
 				
 				BRANCH=$(git rev-parse --abbrev-ref HEAD)
 				echo "------------------------------------------"
+				echo "------------------------------------------"
+				echo "  "
 				echo "DIR: `pwd`"
 				echo "REPO: $REPONAME"
 				echo "REPOURL: $REPONAMEURL"
@@ -97,7 +98,7 @@ for LINE in "${REPOARRAY[@]}"; do
 				echo "  "
 				
 				
-				echo "$GITREPOURL"
+				echo "*** Enter GIT Repo Auth Details (if not already)";
 	
 				if [ -z "$gitusername" ]; then 
 				   echo "Please enter the git repo username: "
@@ -115,21 +116,22 @@ for LINE in "${REPOARRAY[@]}"; do
 				   echo "!!!! using git pasword: $gitpassword"
 				fi
 
-				echo "$GITREPOURL"
+				
+				echo ""
+				echo "*** Fetching Origin (refreshing local)";
+				
 				GITREPOURL="$gitusername:$gitpassword@$GITREPOURL"
-				
-
 				NEWGITREPOURL="${GITREPOURLPREPEND}//${GITREPOURL}"
-				echo "++++++++$NEWGITREPOURL"
-				
 				git remote set-url origin ${NEWGITREPOURL}
 				git fetch origin
 				git remote set-url origin ${REPONAMEURL}
 				
+				echo ""
+				echo "*** Checking for any uncommitted changes";
+				
 				if [ -n "$(git status --porcelain)" ]; then 
-					echo "************************************"; 
+					
 					echo "*** There are uncommited changes";
-					echo "************************************";
 					echo -n "Would you like to commit changes (y/n)? " 
 					read answer
 					if echo "$answer" | grep -iq "^y"; then
@@ -153,11 +155,14 @@ for LINE in "${REPOARRAY[@]}"; do
 					echo "--- no changes to commit";
 				fi
 
+				echo ""
+				echo "*** Checking if a origin push is neccesary - REPO: ${REPONAME}:";
+				
 				ahead=$(git rev-list --count origin/${BRANCH}..${BRANCH})
 				behind=$(git rev-list --count ${BRANCH}..origin/${BRANCH})
 
-				echo "---Checking local branch ahead of origin - REPO: ${REPONAME}: ${ahead} ahead"
-				echo "---Checking local branch behind of origin - REPO: ${REPONAME}: ${behind} behind"
+				echo "--- Checking local/${BRANCH} ahead of origin/${BRANCH} - ${ahead} ahead"
+				echo "--- Checking local/${BRANCH} behind of origin/${BRANCH} - ${behind} behind"
 				
 				if [ "$ahead" -gt 0 ];then
 					echo "-- It seems that the local branch is ${ahead} commit ahead - Lets push to origin"
@@ -167,20 +172,21 @@ for LINE in "${REPOARRAY[@]}"; do
 					git remote set-url origin ${REPONAMEURL}				
 				fi
 				
-				#CHECK WHETHER THE ORIGIN BRANCH IS AHEAD OF MASTER AND CREATE A PULL REQUEST
+				echo ""
+				echo "*** Checking if a pull request push is neccesary - REPO: ${REPONAME}";
+				
 				ahead=$(git rev-list --count origin/master..origin/${BRANCH})
 				behind=$(git rev-list --count origin/${BRANCH}..origin/master)
 
-				echo "---Checking origin/branch ahead of origin/master - REPO: ${REPONAME}: ${ahead} ahead"
-				echo "---Checking origin/branch behind of origin/master - REPO: ${REPONAME}: ${behind} behind"
+				echo "---Checking origin/${BRANCH} ahead of origin/master - ${ahead} ahead"
+				echo "---Checking origin/${BRANCH} behind of origin/master - ${behind} behind"
 				
 				if [ "$ahead" -gt 0 ];then
 					gitpullrequesttitle="Merge ${BRANCH} to master - ${ahead} commits ahead"
 					PR="{ \"title\": \"${gitpullrequesttitle}\", \"description\": \"${gitpullrequesttitle}\", \"source\": { \"branch\": { \"name\": \"${BRANCH}\" } }, \"destination\": { \"branch\": { \"name\": \"master\" } }, \"reviewers\": [ { \"username\": \"wsr.junk@gmail.com\" } ], \"close_source_branch\": false }";
 					
-					echo ${PR}
+					
 					PRURL="https://api.bitbucket.org/2.0/repositories/${PRSLUG}/pullrequests/"
-					echo ${PRURL}
 					echo "************************************"; 
 					echo "*** origin/${BRANCH} is ${ahead} commits from origin/master";
 					echo "************************************";
@@ -188,12 +194,9 @@ for LINE in "${REPOARRAY[@]}"; do
 					read answer
 					if echo "$answer" | grep -iq "^y"; then
 						
-						
-
 						curl -X POST -H "Content-Type: application/json" -u ${gitusername}:${gitpassword} \
 							https://api.bitbucket.org/2.0/repositories/${PRSLUG}/pullrequests/ \
 							-d "${PR}"
-
 
 					else
 						echo "!!!! Changes not being commited"
