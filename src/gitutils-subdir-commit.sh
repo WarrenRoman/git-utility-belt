@@ -70,8 +70,10 @@ for LINE in "${REPOARRAY[@]}"; do
 					REPONAME="${REPONAME//.git}"					
 				fi				
 				
-				IFS='\/\/' read -ra NAMES <<< "${REPONAMEURL}"	
+				REPONAMEURL="$(echo ${REPONAMEURL} | replace '//' '')"
+				IFS=':' read -ra NAMES <<< "${REPONAMEURL}"	
 				GITREPOURLPREPEND=${NAMES[0]}
+				REPONAMEURL=${NAMES[1]}
 				
 				IFS='@' read -ra NAMES <<< "$REPONAMEURL"
 				
@@ -80,6 +82,7 @@ for LINE in "${REPOARRAY[@]}"; do
 				else
 				   GITREPOURL=${NAMES[1]}
 				fi
+				
 				
 				IFS='\/' read -ra NAMES string <<< "$GITREPOURL"
 				PRSLUG="${NAMES[1]}/${NAMES[2]}"
@@ -121,7 +124,9 @@ for LINE in "${REPOARRAY[@]}"; do
 				echo "*** Fetching Origin (refreshing local)";
 				
 				GITREPOURL="$gitusername:$gitpassword@$GITREPOURL"
-				NEWGITREPOURL="${GITREPOURLPREPEND}//${GITREPOURL}"
+				NEWGITREPOURL="${GITREPOURLPREPEND}://${GITREPOURL}"
+				echo ${NEWGITREPOURL}
+				echo ${REPONAMEURL}
 				git remote set-url origin ${NEWGITREPOURL}
 				git fetch origin
 				git remote set-url origin ${REPONAMEURL}
@@ -136,17 +141,17 @@ for LINE in "${REPOARRAY[@]}"; do
 					read answer
 					if echo "$answer" | grep -iq "^y"; then
 						if [ -z "$gitcommitmessage" ]; then 
-						   echo "Please enter the git repo password: "
+						   echo "Please enter the git repo commit message: "
 						   read input_gitcommitmessage
 						   gitcommitmessage=$input_gitcommitmessage
 							
 						else
-						   echo "!!!! using git pasword: $gitpassword"
+						   echo "!!!! using git commit message: $gitcommitmessage"
 						fi
-						git remote set-url origin ${NEWGITREPOURL}
+						git remote set-url origin "${NEWGITREPOURL}"
 						git commit -a -m "${gitcommitmessage}"
 						git fetch origin
-						git remote set-url origin ${REPONAMEURL}
+						git remote set-url origin "${REPONAMEURL}"
 
 					else
 						echo "!!!! Changes not being commited"
@@ -166,10 +171,10 @@ for LINE in "${REPOARRAY[@]}"; do
 				
 				if [ "$ahead" -gt 0 ];then
 					echo "-- It seems that the local branch is ${ahead} commit ahead - Lets push to origin"
-					git remote set-url origin ${NEWGITREPOURL}
+					git remote set-url origin "${NEWGITREPOURL}"
 					git push origin
 					git fetch origin
-					git remote set-url origin ${REPONAMEURL}				
+					git remote set-url origin "${REPONAMEURL}"			
 				fi
 				
 				echo ""
