@@ -1,7 +1,8 @@
-# git-utility-belt
-GIT UTILITY BELT - Useful utililties for helping with everyday GIT duties
+# GIT UTILITY BELT
 
+Useful utililties for helping with everyday GIT duties
 
+## Why
 As a dev working on a single project but spread over multiple repos I found wasting a lot of time. So with this in mind I set out to create a GIT UTILITY BELT to help speed up development. 
 Hope this helps someone as it grows and feel free to contribute.
 
@@ -15,8 +16,7 @@ For each repo
 2. Check if any local/branch is ahead of origin/branch. If local/branch is ahead it prompts and asked whether you want to do a origin push - does origin push if answer is yes<br />
 3. Check if any origin/branch is ahead of origin/master. If origin/branch is ahead it prompts and asked whether you want to do a pull request - does pull request if answer is yes (pull  request only currently available for bitbucket API)
 
-
-<b>Disclaimer:</b><br />
+## Licence
 GIT UTILITY BELT is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
